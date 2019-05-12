@@ -1,0 +1,20 @@
+patch_size = 128
+
+model_params = {
+  'input_shape': (2, patch_size, patch_size),
+  'output_shape': (1, patch_size, patch_size),
+  'tfx_params': {
+    'nrow': patch_size,
+    'ncol': patch_size,
+    'nch_in': 2,
+    'kernel_size': 1,
+    'nl': 'relu',
+    'init_fourier': False,
+    'init': 'xavier_uniform_',
+    'bias': True,
+    'share_tfxs': False,
+    'learnable': True,
+  },
+  'depth': 2,
+  'nl':'relu'
+}
