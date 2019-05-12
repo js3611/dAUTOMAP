@@ -292,14 +292,17 @@ class dAUTOMAP(nn.Module):
 
     Decomposes the automap kernel into 2 Generalised "1D" transforms to make it scalable.
     """
-    def __init__(self, input_shape, output_shape, tfx_params, tfx_params2):
-        super(SMAP, self).__init__()
+    def __init__(self, input_shape, output_shape, tfx_params, tfx_params2=None):
+        super(dAUTOMAP, self).__init__()
         self.input_shape = input_shape
         self.output_shape = output_shape
 
+        if tfx_params2 is None:
+            tfx_params2 = tfx_params
+
         self.domain_transform = GeneralisedIFT2Layer(**tfx_params)
         self.domain_transform2 = GeneralisedIFT2Layer(**tfx_params2)
-        self.processor = get_refinement_block('automap_scae', input_shape[0], output_shape[0])
+        self.refinement_block = get_refinement_block('automap_scae', input_shape[0], output_shape[0])
 
     def forward(self, x):
         """Assumes input to be (batch_size, 2, nrow, ncol)"""
@@ -307,7 +310,7 @@ class dAUTOMAP(nn.Module):
         x_mapped = F.tanh(x_mapped)
         x_mapped2 = self.domain_transform2(x_mapped)
         x_mapped2 = F.tanh(x_mapped2)
-        out = self.processor(x_mapped2)
+        out = self.refinement_block(x_mapped2)
         return out
 
 
@@ -331,7 +334,7 @@ class dAUTOMAPExt(nn.Module):
 
     """
     def __init__(self, input_shape, output_shape, tfx_params=None, depth=2, nl='tanh'):
-        super(SDAUTOMAP, self).__init__()
+        super(dAUTOMAPExt, self).__init__()
         self.input_shape = input_shape
         self.output_shape = output_shape
         self.depth = depth
